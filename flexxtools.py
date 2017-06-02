@@ -13,11 +13,8 @@ import time
 np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
 
 
-class coordsJuggler(object):
-    #
-    # Resulting array describes how the lattice a, b, c is expressed
-    # in the L system, ak 'Mother of all coordinate systems'
-    #
+class UBmatrix(object):
+
     def calculateBinL(self):
         latparam = self.conf.sample['latparam']
         a, b, c, alphadeg, betadeg, gammadeg = latparam

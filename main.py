@@ -14,7 +14,12 @@ mpl.rcParams.update({'axes.labelsize': 16,
                      'xtick.labelsize': 16,
                      'ytick.labelsize': 16})
 
+
+
 def onpick(event):
+    if plt.get_current_fig_manager().toolbar.mode != '':
+        return
+
     ind = event.ind[0]
     if event.mouseevent.button == 1:
         evt_artist = event.artist
@@ -32,6 +37,8 @@ def onpick(event):
 
 
 def onclick(event):
+    if plt.get_current_fig_manager().toolbar.mode != '':
+        return
 
     if event.button == 3:
         x, y = (event.xdata, event.ydata)
@@ -62,12 +69,14 @@ def onclick(event):
 
 
 def onkey(event):
+    number_sets = len(event.canvas.figure.hm_scatter)
+    active_channel = event.canvas.figure.handles_hm['active_channel']
+
     if event.key == ';':
         fig = event.canvas.figure
         fig.savefig('save.png', dpi=600)
-    number_sets = len(event.canvas.figure.hm_scatter)
-    active_channel = event.canvas.figure.handles_hm['active_channel']
-    if event.key == ' ':
+
+    elif event.key == ' ':
         visible = event.canvas.figure.hm_scatter[active_channel - 1].get_visible()
         if visible:
             event.canvas.figure.hm_scatter[active_channel - 1].set_visible(False)
@@ -154,7 +163,7 @@ def plotScatter(core, ch, ax):
     ssr = core.conf.horizontal_magnet['sample_stick_rotation']
     points = []
     colors = []
-    for a3 in np.linspace(a3start, a3end, np.abs(a3end - a3start) / 3):
+    for a3 in np.linspace(a3start, a3end, int(np.abs(a3end - a3start) / 3)):
         for a4 in np.linspace(a4start, a4end, 20):
             QP, t = ft.angleToPlot(core, core.conf.instrument['ki'], core.conf.instrument['kf'][ch - 1], a3, a4,
                                    hm=True, ssr=ssr)
@@ -204,7 +213,7 @@ def plotLattice(core, ax):
 
 def main():
     conf = ft.config('simFLEXX.conf')
-    core = ft.coordsJuggler(conf)
+    core = ft.UBmatrix(conf)
 
     fig_qspace = plt.figure()
     fig_qspace.canvas.mpl_connect('pick_event', onpick)
